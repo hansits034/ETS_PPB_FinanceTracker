@@ -2,6 +2,11 @@
 
 Aplikasi pelacak keuangan pribadi berbasis Android menggunakan **Jetpack Compose**. Aplikasi ini memungkinkan pengguna untuk mencatat pemasukan dan pengeluaran harian, memantau tren keuangan melalui grafik interaktif, serta melihat ringkasan kategori pengeluaran secara intuitif.
 
+<img width="514" height="1089" alt="image" src="https://github.com/user-attachments/assets/78a574ae-210b-4adb-aaaa-439ef98e5eff" />
+<img width="472" height="1037" alt="image" src="https://github.com/user-attachments/assets/11e10597-206d-47c1-802a-d14a67c526b8" />
+<img width="474" height="1034" alt="image" src="https://github.com/user-attachments/assets/2882bd94-ee69-4148-9b80-b81ee07a7d60" />
+
+
 ## 🚀 Fitur Utama
 
 - **Dashboard Keuangan:** Menampilkan saldo saat ini, total pendapatan, total pengeluaran, dan rata-rata pengeluaran harian.
