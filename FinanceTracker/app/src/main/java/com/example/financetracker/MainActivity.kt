@@ -321,13 +321,21 @@ fun LineChartCard(transactions: List<Transaction>) {
             ) {
                 LegendItem(color = Emerald500, label = "Penghasilan")
                 LegendItem(color = Rose500, label = "Pengeluaran")
-                LegendItem(color = Blue500, label = "Selisih")
+                // 1. Ubah label legend menjadi Saldo
+                LegendItem(color = Blue500, label = "Saldo")
             }
 
             val today = LocalDate.now()
             val thirtyDaysAgo = today.minusDays(30)
             val startEpoch = thirtyDaysAgo.toEpochDay()
             val totalDays = 30f
+
+            // 2. Hitung Saldo Awal (sebelum 30 hari terakhir)
+            val pastTransactions = transactions.filter {
+                safeParseDate(it.date).isBefore(thirtyDaysAgo)
+            }
+            val initialBalance = pastTransactions.filter { it.type == "Penghasilan" }.sumOf { it.amount } -
+                    pastTransactions.filter { it.type == "Pengeluaran" }.sumOf { it.amount }
 
             val recentTx = transactions.filter {
                 val txDate = safeParseDate(it.date)
@@ -346,10 +354,18 @@ fun LineChartCard(transactions: List<Transaction>) {
 
             val incomeData = sortedDates.map { grouped[it]!!.filter { t -> t.type == "Penghasilan" }.sumOf { t -> t.amount } }
             val expenseData = sortedDates.map { grouped[it]!!.filter { t -> t.type == "Pengeluaran" }.sumOf { t -> t.amount } }
-            val netData = incomeData.zip(expenseData).map { (inc, exp) -> inc - exp }
 
-            val maxVal = maxOf(incomeData.maxOrNull() ?: 0, expenseData.maxOrNull() ?: 0, netData.maxOrNull() ?: 0, 1000).toFloat()
-            val minVal = minOf(netData.minOrNull() ?: 0, 0).toFloat()
+            // 3. Kalkulasi Saldo Kumulatif
+            var runningBalance = initialBalance
+            val balanceData = mutableListOf<Int>()
+            for (i in sortedDates.indices) {
+                runningBalance += (incomeData[i] - expenseData[i])
+                balanceData.add(runningBalance)
+            }
+
+            // Sesuaikan maxVal dan minVal menggunakan balanceData
+            val maxVal = maxOf(incomeData.maxOrNull() ?: 0, expenseData.maxOrNull() ?: 0, balanceData.maxOrNull() ?: 0, 1000).toFloat()
+            val minVal = minOf(balanceData.minOrNull() ?: 0, 0).toFloat()
             val range = if (maxVal - minVal == 0f) 1000f else maxVal - minVal
 
             Canvas(modifier = Modifier.fillMaxWidth().height(220.dp).padding(top = 10.dp, bottom = 20.dp)) {
@@ -414,7 +430,8 @@ fun LineChartCard(transactions: List<Transaction>) {
 
                 drawLineFor(incomeData, Emerald500)
                 drawLineFor(expenseData, Rose500)
-                drawLineFor(netData, Blue500)
+                // 4. Ubah rendering garis biru menggunakan data Saldo
+                drawLineFor(balanceData, Blue500)
             }
         }
     }
